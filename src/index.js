@@ -29,6 +29,10 @@ class Board extends React.Component {
   // 讓「X」和「O」輪流出現
   handleClick(i){
     const squares = this.state.squares.slice();
+    // 假如已經分出勝負 OR 已經被填滿
+    if (calculateWinner(squares) || squares[i]){
+      return;
+    }
     squares[i] = this.state.xIsNext ? 'X':'O';
     console.log('handle Click!, Trun Next Player ');
     this.setState({
@@ -48,7 +52,15 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: '+ (this.state.xIsNext ? 'X':'O');
+    // 確認是否有贏家產生
+    const Winner = calculateWinner(this.state.squares);
+    let status;
+    if(Winner){
+      status = 'Winner: '+ Winner;
+    }else{
+      status = 'Next player: '+ (this.state.xIsNext ?'X' : 'O');
+    }
+
     return (
       <div>
         <div className="status">{status}</div>
@@ -91,3 +103,24 @@ class Game extends React.Component {
 // ========================================
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<Game />);
+
+// 檢查玩家 & 依據需要 傳回 X,O,null
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
